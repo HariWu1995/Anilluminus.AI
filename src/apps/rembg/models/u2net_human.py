@@ -1,36 +1,36 @@
 import os
+import pooch
+
 from typing import List
 
 import numpy as np
-import pooch
+
 from PIL import Image
-from PIL.Image import Image as PILImage
+from PIL.Image import Image as ImageClass
 
-from .base import BaseSession
+from .base import BaseModel
 
 
-class U2netHumanSegSession(BaseSession):
+class U2netHuman(BaseModel):
     """
     This class represents a session for performing human segmentation using the U2Net model.
     """
 
-    def predict(self, img: PILImage, *args, **kwargs) -> List[PILImage]:
+    def predict(self, img: ImageClass, *args, **kwargs) -> List[ImageClass]:
         """
         Predicts human segmentation masks for the input image.
 
         Parameters:
-            img (PILImage): The input image.
+            img (ImageClass): The input image.
             *args: Variable length argument list.
             **kwargs: Arbitrary keyword arguments.
 
         Returns:
-            List[PILImage]: A list of predicted masks.
+            List[ImageClass]: A list of predicted masks.
         """
         ort_outs = self.inner_session.run(
             None,
-            self.normalize(
-                img, (0.485, 0.456, 0.406), (0.229, 0.224, 0.225), (320, 320)
-            ),
+            self.normalize(img, (0.485, 0.456, 0.406), (0.229, 0.224, 0.225), (320, 320)),
         )
 
         pred = ort_outs[0][:, 0, :, :]
@@ -61,11 +61,7 @@ class U2netHumanSegSession(BaseSession):
         fname = f"{cls.name(*args, **kwargs)}.onnx"
         pooch.retrieve(
             "https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2net_human_seg.onnx",
-            (
-                None
-                if cls.checksum_disabled(*args, **kwargs)
-                else "md5:c09ddc2e0104f800e3e1bb4652583d1f"
-            ),
+            None if cls.checksum_disabled(*args, **kwargs) else "md5:c09ddc2e0104f800e3e1bb4652583d1f",
             fname=fname,
             path=cls.u2net_home(*args, **kwargs),
             progressbar=True,
@@ -85,4 +81,4 @@ class U2netHumanSegSession(BaseSession):
         Returns:
             str: The name of the model.
         """
-        return "u2net_human_seg"
+        return "u2net_human"

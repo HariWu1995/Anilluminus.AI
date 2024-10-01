@@ -1,62 +1,25 @@
 import os
+import pooch
+
 from typing import List
 
 import numpy as np
-import pooch
-from PIL import Image
-from PIL.Image import Image as PILImage
 from scipy.special import log_softmax
 
-from .base import BaseSession
+from PIL import Image
+from PIL.Image import Image as ImageClass
 
-palette1 = [
-    0,
-    0,
-    0,
-    255,
-    255,
-    255,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-]
-
-palette2 = [
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    255,
-    255,
-    255,
-    0,
-    0,
-    0,
-]
-
-palette3 = [
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    255,
-    255,
-    255,
-]
+from .base import BaseModel
 
 
-class Unet2ClothSession(BaseSession):
-    def predict(self, img: PILImage, *args, **kwargs) -> List[PILImage]:
+palette1 = [0, 0, 0, 255, 255, 255, 0, 0, 0, 0, 0, 0]
+palette2 = [0, 0, 0, 0, 0, 0, 255, 255, 255, 0, 0, 0]
+palette3 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 255]
+
+
+class U2netCloth(BaseModel):
+
+    def predict(self, img: ImageClass, *args, **kwargs) -> List[ImageClass]:
         """
         Predict the cloth category of an image.
 
@@ -66,12 +29,12 @@ class Unet2ClothSession(BaseSession):
         Depending on the cloth category specified in the method arguments, the method applies different color palettes to the mask and appends the resulting images to a list.
 
         Parameters:
-            img (PILImage): The input image.
+            img (ImageClass): The input image.
             *args: Additional positional arguments.
             **kwargs: Additional keyword arguments.
 
         Returns:
-            List[PILImage]: A list of images representing the predicted masks.
+            List[ImageClass]: A list of images representing the predicted masks.
         """
         ort_outs = self.inner_session.run(
             None,
@@ -129,11 +92,7 @@ class Unet2ClothSession(BaseSession):
         fname = f"{cls.name(*args, **kwargs)}.onnx"
         pooch.retrieve(
             "https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2net_cloth_seg.onnx",
-            (
-                None
-                if cls.checksum_disabled(*args, **kwargs)
-                else "md5:2434d1f3cb744e0e49386c906e5a08bb"
-            ),
+            None if cls.checksum_disabled(*args, **kwargs) else "md5:2434d1f3cb744e0e49386c906e5a08bb",
             fname=fname,
             path=cls.u2net_home(*args, **kwargs),
             progressbar=True,
@@ -143,4 +102,4 @@ class Unet2ClothSession(BaseSession):
 
     @classmethod
     def name(cls, *args, **kwargs):
-        return "u2net_cloth_seg"
+        return "u2net_cloth"

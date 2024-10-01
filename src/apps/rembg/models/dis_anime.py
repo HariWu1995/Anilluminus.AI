@@ -1,30 +1,32 @@
 import os
+import pooch
+
 from typing import List
 
 import numpy as np
-import pooch
+
 from PIL import Image
-from PIL.Image import Image as PILImage
+from PIL.Image import Image as ImageClass
 
-from .base import BaseSession
+from .base import BaseModel
 
 
-class DisSession(BaseSession):
+class Dis(BaseModel):
     """
     This class represents a session for object detection.
     """
 
-    def predict(self, img: PILImage, *args, **kwargs) -> List[PILImage]:
+    def predict(self, img: ImageClass, *args, **kwargs) -> List[ImageClass]:
         """
         Use a pre-trained model to predict the object in the given image.
 
         Parameters:
-            img (PILImage): The input image.
+            img (ImageClass): The input image.
             *args: Variable length argument list.
             **kwargs: Arbitrary keyword arguments.
 
         Returns:
-            List[PILImage]: A list of predicted mask images.
+            List[ImageClass]: A list of predicted mask images.
         """
         ort_outs = self.inner_session.run(
             None,
@@ -59,11 +61,7 @@ class DisSession(BaseSession):
         fname = f"{cls.name(*args, **kwargs)}.onnx"
         pooch.retrieve(
             "https://github.com/danielgatis/rembg/releases/download/v0.0.0/isnet-anime.onnx",
-            (
-                None
-                if cls.checksum_disabled(*args, **kwargs)
-                else "md5:6f184e756bb3bd901c8849220a83e38e"
-            ),
+            None if cls.checksum_disabled(*args, **kwargs) else "md5:6f184e756bb3bd901c8849220a83e38e",
             fname=fname,
             path=cls.u2net_home(*args, **kwargs),
             progressbar=True,

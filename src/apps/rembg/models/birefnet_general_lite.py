@@ -1,13 +1,12 @@
 import os
-
 import pooch
 
-from . import BiRefNetSessionGeneral
+from . import BiRefNetGeneral
 
 
-class BiRefNetSessionGeneralLite(BiRefNetSessionGeneral):
+class BiRefNetGeneralLite(BiRefNetGeneral):
     """
-    This class represents a BiRefNet-General-Lite session, which is a subclass of BiRefNetSessionGeneral.
+    This class represents a BiRefNet-General-Lite session, which is a subclass of BiRefNetGeneral.
     """
 
     @classmethod
@@ -25,11 +24,7 @@ class BiRefNetSessionGeneralLite(BiRefNetSessionGeneral):
         fname = f"{cls.name(*args, **kwargs)}.onnx"
         pooch.retrieve(
             "https://github.com/danielgatis/rembg/releases/download/v0.0.0/BiRefNet-general-bb_swin_v1_tiny-epoch_232.onnx",
-            (
-                None
-                if cls.checksum_disabled(*args, **kwargs)
-                else "md5:4fab47adc4ff364be1713e97b7e66334"
-            ),
+            None if cls.checksum_disabled(*args, **kwargs) else "md5:4fab47adc4ff364be1713e97b7e66334",
             fname=fname,
             path=cls.u2net_home(*args, **kwargs),
             progressbar=True,

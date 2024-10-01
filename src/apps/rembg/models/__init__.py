@@ -1,88 +1,100 @@
 from __future__ import annotations
 
 from typing import List
+from .base import BaseModel
 
-from .base import BaseSession
 
-sessions_class: List[type[BaseSession]] = []
+sessions_class: List[type[BaseModel]] = []
 sessions_names: List[str] = []
 
-from .birefnet_general import BiRefNetSessionGeneral
+"""
+BiRefNet Family
+"""
+from .birefnet_general import BiRefNetGeneral
 
-sessions_class.append(BiRefNetSessionGeneral)
-sessions_names.append(BiRefNetSessionGeneral.name())
+sessions_class.append(BiRefNetGeneral)
+sessions_names.append(BiRefNetGeneral.name())
 
-from .birefnet_general_lite import BiRefNetSessionGeneralLite
+from .birefnet_general_lite import BiRefNetGeneralLite
 
-sessions_class.append(BiRefNetSessionGeneralLite)
-sessions_names.append(BiRefNetSessionGeneralLite.name())
+sessions_class.append(BiRefNetGeneralLite)
+sessions_names.append(BiRefNetGeneralLite.name())
 
-from .birefnet_portrait import BiRefNetSessionPortrait
+from .birefnet_portrait import BiRefNetPortrait
 
-sessions_class.append(BiRefNetSessionPortrait)
-sessions_names.append(BiRefNetSessionPortrait.name())
+sessions_class.append(BiRefNetPortrait)
+sessions_names.append(BiRefNetPortrait.name())
 
-from .birefnet_dis import BiRefNetSessionDIS
+from .birefnet_dis import BiRefNetDIS
 
-sessions_class.append(BiRefNetSessionDIS)
-sessions_names.append(BiRefNetSessionDIS.name())
+sessions_class.append(BiRefNetDIS)
+sessions_names.append(BiRefNetDIS.name())
 
-from .birefnet_hrsod import BiRefNetSessionHRSOD
+from .birefnet_hrsod import BiRefNetHRSOD
 
-sessions_class.append(BiRefNetSessionHRSOD)
-sessions_names.append(BiRefNetSessionHRSOD.name())
+sessions_class.append(BiRefNetHRSOD)
+sessions_names.append(BiRefNetHRSOD.name())
 
-from .birefnet_cod import BiRefNetSessionCOD
+from .birefnet_cod import BiRefNetCOD
 
-sessions_class.append(BiRefNetSessionCOD)
-sessions_names.append(BiRefNetSessionCOD.name())
+sessions_class.append(BiRefNetCOD)
+sessions_names.append(BiRefNetCOD.name())
 
-from .birefnet_massive import BiRefNetSessionMassive
+from .birefnet_massive import BiRefNetMassive
 
-sessions_class.append(BiRefNetSessionMassive)
-sessions_names.append(BiRefNetSessionMassive.name())
+sessions_class.append(BiRefNetMassive)
+sessions_names.append(BiRefNetMassive.name())
 
-from .dis_anime import DisSession
+"""
+ISNet Family
+"""
+from .dis_anime import Dis as DisAnime
 
-sessions_class.append(DisSession)
-sessions_names.append(DisSession.name())
+sessions_class.append(DisAnime)
+sessions_names.append(DisAnime.name())
 
-from .dis_general_use import DisSession as DisSessionGeneralUse
+from .dis_general import Dis as DisGeneral
 
-sessions_class.append(DisSessionGeneralUse)
-sessions_names.append(DisSessionGeneralUse.name())
+sessions_class.append(DisGeneral)
+sessions_names.append(DisGeneral.name())
 
-from .sam import SamSession
+"""
+SAM Family
+"""
+from .sam import Sam
 
-sessions_class.append(SamSession)
-sessions_names.append(SamSession.name())
+sessions_class.append(Sam)
+sessions_names.append(Sam.name())
 
-from .silueta import SiluetaSession
+"""
+U2Net Family
+"""
+from .silueta import Silueta
 
-sessions_class.append(SiluetaSession)
-sessions_names.append(SiluetaSession.name())
+sessions_class.append(Silueta)
+sessions_names.append(Silueta.name())
 
-from .u2net_cloth_seg import Unet2ClothSession
+from .u2net_cloth import U2netCloth
 
-sessions_class.append(Unet2ClothSession)
-sessions_names.append(Unet2ClothSession.name())
+sessions_class.append(U2netCloth)
+sessions_names.append(U2netCloth.name())
 
-from .u2net_custom import U2netCustomSession
+from .u2net_custom import U2netCustom
 
-sessions_class.append(U2netCustomSession)
-sessions_names.append(U2netCustomSession.name())
+sessions_class.append(U2netCustom)
+sessions_names.append(U2netCustom.name())
 
-from .u2net_human_seg import U2netHumanSegSession
+from .u2net_human import U2netHuman
 
-sessions_class.append(U2netHumanSegSession)
-sessions_names.append(U2netHumanSegSession.name())
+sessions_class.append(U2netHuman)
+sessions_names.append(U2netHuman.name())
 
-from .u2net import U2netSession
+from .u2net import U2net
 
-sessions_class.append(U2netSession)
-sessions_names.append(U2netSession.name())
+sessions_class.append(U2net)
+sessions_names.append(U2net.name())
 
-from .u2netp import U2netpSession
+from .u2netp import U2netp
 
-sessions_class.append(U2netpSession)
-sessions_names.append(U2netpSession.name())
+sessions_class.append(U2netp)
+sessions_names.append(U2netp.name())

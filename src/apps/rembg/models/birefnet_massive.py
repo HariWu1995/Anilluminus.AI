@@ -1,13 +1,12 @@
 import os
-
 import pooch
 
-from . import BiRefNetSessionGeneral
+from . import BiRefNetGeneral
 
 
-class BiRefNetSessionMassive(BiRefNetSessionGeneral):
+class BiRefNetMassive(BiRefNetGeneral):
     """
-    This class represents a BiRefNet-Massive session, which is a subclass of BiRefNetSessionGeneral.
+    This class represents a BiRefNet-Massive session, which is a subclass of BiRefNetGeneral.
     """
 
     @classmethod
@@ -25,11 +24,7 @@ class BiRefNetSessionMassive(BiRefNetSessionGeneral):
         fname = f"{cls.name(*args, **kwargs)}.onnx"
         pooch.retrieve(
             "https://github.com/danielgatis/rembg/releases/download/v0.0.0/BiRefNet-massive-TR_DIS5K_TR_TEs-epoch_420.onnx",
-            (
-                None
-                if cls.checksum_disabled(*args, **kwargs)
-                else "md5:33e726a2136a3d59eb0fdf613e31e3e9"
-            ),
+            None if cls.checksum_disabled(*args, **kwargs) else "md5:33e726a2136a3d59eb0fdf613e31e3e9",
             fname=fname,
             path=cls.u2net_home(*args, **kwargs),
             progressbar=True,

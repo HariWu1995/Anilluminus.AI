@@ -1,13 +1,12 @@
 import os
-
 import pooch
 
-from . import BiRefNetSessionGeneral
+from . import BiRefNetGeneral
 
 
-class BiRefNetSessionHRSOD(BiRefNetSessionGeneral):
+class BiRefNetHRSOD(BiRefNetGeneral):
     """
-    This class represents a BiRefNet-HRSOD session, which is a subclass of BiRefNetSessionGeneral.
+    This class represents a BiRefNet-HRSOD session, which is a subclass of BiRefNetGeneral.
     """
 
     @classmethod
@@ -25,11 +24,7 @@ class BiRefNetSessionHRSOD(BiRefNetSessionGeneral):
         fname = f"{cls.name(*args, **kwargs)}.onnx"
         pooch.retrieve(
             "https://github.com/danielgatis/rembg/releases/download/v0.0.0/BiRefNet-HRSOD_DHU-epoch_115.onnx",
-            (
-                None
-                if cls.checksum_disabled(*args, **kwargs)
-                else "md5:c017ade5de8a50ff0fd74d790d268dda"
-            ),
+            None if cls.checksum_disabled(*args, **kwargs) else "md5:c017ade5de8a50ff0fd74d790d268dda",
             fname=fname,
             path=cls.u2net_home(*args, **kwargs),
             progressbar=True,

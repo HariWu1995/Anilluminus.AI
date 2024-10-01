@@ -1,26 +1,30 @@
 import os
+import pooch
+
 from typing import List
 
 import numpy as np
-import pooch
+
 from PIL import Image
-from PIL.Image import Image as PILImage
+from PIL.Image import Image as ImageClass
 
-from .base import BaseSession
+from .base import BaseModel
 
 
-class DisSession(BaseSession):
-    def predict(self, img: PILImage, *args, **kwargs) -> List[PILImage]:
+class Dis(BaseModel):
+
+    def predict(self, img: ImageClass, *args, **kwargs) -> List[ImageClass]:
         """
         Predicts the mask image for the input image.
 
-        This method takes a PILImage object as input and returns a list of PILImage objects as output. It performs several image processing operations to generate the mask image.
+        This method takes a ImageClass object as input and returns a list of ImageClass objects as output. 
+        It performs several image processing operations to generate the mask image.
 
         Parameters:
-            img (PILImage): The input image.
+            img (ImageClass): The input image.
 
         Returns:
-            List[PILImage]: A list of PILImage objects representing the generated mask image.
+            List[ImageClass]: A list of ImageClass objects representing the generated mask image.
         """
         ort_outs = self.inner_session.run(
             None,
@@ -57,11 +61,7 @@ class DisSession(BaseSession):
         fname = f"{cls.name(*args, **kwargs)}.onnx"
         pooch.retrieve(
             "https://github.com/danielgatis/rembg/releases/download/v0.0.0/isnet-general-use.onnx",
-            (
-                None
-                if cls.checksum_disabled(*args, **kwargs)
-                else "md5:fc16ebd8b0c10d971d3513d564d01e29"
-            ),
+            None if cls.checksum_disabled(*args, **kwargs) else "md5:fc16ebd8b0c10d971d3513d564d01e29",
             fname=fname,
             path=cls.u2net_home(*args, **kwargs),
             progressbar=True,

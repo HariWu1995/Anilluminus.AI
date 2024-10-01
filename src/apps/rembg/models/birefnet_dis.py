@@ -1,13 +1,12 @@
 import os
-
 import pooch
 
-from . import BiRefNetSessionGeneral
+from . import BiRefNetGeneral
 
 
-class BiRefNetSessionDIS(BiRefNetSessionGeneral):
+class BiRefNetDIS(BiRefNetGeneral):
     """
-    This class represents a BiRefNet-DIS session, which is a subclass of BiRefNetSessionGeneral.
+    This class represents a BiRefNet-DIS session, which is a subclass of BiRefNetGeneral.
     """
 
     @classmethod
@@ -25,11 +24,7 @@ class BiRefNetSessionDIS(BiRefNetSessionGeneral):
         fname = f"{cls.name(*args, **kwargs)}.onnx"
         pooch.retrieve(
             "https://github.com/danielgatis/rembg/releases/download/v0.0.0/BiRefNet-DIS-epoch_590.onnx",
-            (
-                None
-                if cls.checksum_disabled(*args, **kwargs)
-                else "md5:2d4d44102b446f33a4ebb2e56c051f2b"
-            ),
+            None if cls.checksum_disabled(*args, **kwargs) else "md5:2d4d44102b446f33a4ebb2e56c051f2b",
             fname=fname,
             path=cls.u2net_home(*args, **kwargs),
             progressbar=True,

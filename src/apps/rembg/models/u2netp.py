@@ -1,32 +1,33 @@
 import os
+import pooch
+
 from typing import List
 
 import numpy as np
-import pooch
+
 from PIL import Image
-from PIL.Image import Image as PILImage
+from PIL.Image import Image as ImageClass
 
-from .base import BaseSession
+from .base import BaseModel
 
 
-class U2netpSession(BaseSession):
-    """This class represents a session for using the U2netp model."""
-
-    def predict(self, img: PILImage, *args, **kwargs) -> List[PILImage]:
+class U2netp(BaseModel):
+    """
+    This class represents a session for using the U2-Net† model.
+    """
+    def predict(self, img: ImageClass, *args, **kwargs) -> List[ImageClass]:
         """
         Predicts the mask for the given image using the U2netp model.
 
         Parameters:
-            img (PILImage): The input image.
+            img (ImageClass): The input image.
 
         Returns:
-            List[PILImage]: The predicted mask.
+            List[ImageClass]: The predicted mask.
         """
         ort_outs = self.inner_session.run(
             None,
-            self.normalize(
-                img, (0.485, 0.456, 0.406), (0.229, 0.224, 0.225), (320, 320)
-            ),
+            self.normalize(img, (0.485, 0.456, 0.406), (0.229, 0.224, 0.225), (320, 320)),
         )
 
         pred = ort_outs[0][:, 0, :, :]
@@ -53,11 +54,7 @@ class U2netpSession(BaseSession):
         fname = f"{cls.name(*args, **kwargs)}.onnx"
         pooch.retrieve(
             "https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2netp.onnx",
-            (
-                None
-                if cls.checksum_disabled(*args, **kwargs)
-                else "md5:8e83ca70e441ab06c318d82300c84806"
-            ),
+            None if cls.checksum_disabled(*args, **kwargs) else "md5:8e83ca70e441ab06c318d82300c84806",
             fname=fname,
             path=cls.u2net_home(*args, **kwargs),
             progressbar=True,
