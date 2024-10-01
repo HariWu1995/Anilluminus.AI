@@ -5,7 +5,7 @@
 ## To-Do List
 
 - [x] GUI (inherited from [A1111](https://github.com/AUTOMATIC1111/stable-diffusion-webui))
-- [ ] **Background** Removal
+- [x] **Background** Removal
 - [ ] **Background** Stylization (with **Lighting** Control)
 - [ ] **Animation** (AnimateDiff v2, with **Camera** Control)
 - [ ] **Voiceover** / **Music**

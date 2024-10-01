@@ -47,7 +47,7 @@ def create_ui(min_width: int = 25):
     
     with gr.Blocks(css=None, analytics_enabled=False) as gui:
 
-        gr.Markdown("## 🖼 Background Removal")
+        gr.Markdown("## 🖼 Background Decomposition")
 
         with gr.Row():
             img_in = gr.Image(label='Input')
@@ -57,7 +57,7 @@ def create_ui(min_width: int = 25):
         with gr.Row():
 
             with gr.Column(scale=1, **column_kwargs):
-                run_button = gr.Button(value="Process", variant='primary')
+                run_button = gr.Button(value="Decompose", variant='primary')
                 # send_button = gr.Button(value="Send ⇩", variant='secondary')
 
             with gr.Column(scale=2, **column_kwargs):
@@ -77,5 +77,5 @@ def create_ui(min_width: int = 25):
         alpha.change(fn=display_alpha, inputs=[alpha], outputs=[alpha_mask_options])
         run_button.click(fn=run_rembg, inputs=rembg_inputs, outputs=[img_out, img_mask])
 
-    return gui, (img_out, img_mask), run_button
+    return gui, [img_out, img_mask]
 

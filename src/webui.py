@@ -11,19 +11,28 @@ from .usage import tips
 
 # Layout
 
+transfer_data = lambda x: x
+transdup_data = lambda x: [x, x]
+transfer_list = lambda x, y: [x, y]
+
+
 def load_mini_apps():
 
     from src.apps.rembg.ui import create_ui as create_ui_rembg
+    from src.apps.genbg.ui import create_ui as create_ui_genbg
 
-    gui_rembg, *out_rembg = create_ui_rembg()
+    with gr.Blocks(css=None, analytics_enabled=False) as gui_background:
 
-    return  (gui_rembg, ), \
-            (out_rembg, )
+        gui_rembg, img_rembg = create_ui_rembg()
+        gui_genbg, img_genbg = create_ui_genbg(*img_rembg[:2])
+
+    return  (gui_background, ), \
+            (img_genbg[-1], )
 
 
 def run_demo(server: str = 'localhost', port: int = 7861, share: bool = False):
 
-    tabs, (out_rembg) = load_mini_apps()
+    tabs, *_ = load_mini_apps()
 
     names = ["Background"]
 
@@ -34,10 +43,6 @@ def run_demo(server: str = 'localhost', port: int = 7861, share: bool = False):
         gr.Markdown(description)
 
         # Body
-
-        transfer_data = lambda x: x
-        transdup_data = lambda x: [x, x]
-        transfer_list = lambda x, y: [x, y]
 
         gr.TabbedInterface(interface_list=tabs, tab_names=names)
 
