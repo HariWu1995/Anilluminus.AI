@@ -3,6 +3,19 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Local folders
+logs/
+extensions/
+# venv/
+# checkpoints/
+
+# Checkpoints
+*.safetensors
+*.ckpt
+*.pth
+*.pt
+*.bin
+
 # C extensions
 *.so
 
