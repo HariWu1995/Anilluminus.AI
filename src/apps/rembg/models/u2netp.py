@@ -56,11 +56,11 @@ class U2netp(BaseModel):
             "https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2netp.onnx",
             None if cls.checksum_disabled(*args, **kwargs) else "md5:8e83ca70e441ab06c318d82300c84806",
             fname=fname,
-            path=cls.u2net_home(*args, **kwargs),
+            path=cls.ckpt_dir(*args, **kwargs),
             progressbar=True,
         )
 
-        return os.path.join(cls.u2net_home(*args, **kwargs), fname)
+        return os.path.join(cls.ckpt_dir(*args, **kwargs), fname)
 
     @classmethod
     def name(cls, *args, **kwargs):

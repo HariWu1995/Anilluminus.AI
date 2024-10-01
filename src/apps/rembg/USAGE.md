@@ -28,7 +28,7 @@ output.save(output_path)
 You can use the `new_session` function to create a session with a specific model.
 
 ```python
-model_name = "isnet-general-use"
+model_name = "isnet-general"
 session = new_session(model_name)
 output = remove(input, session=session)
 ```

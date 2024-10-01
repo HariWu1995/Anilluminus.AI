@@ -26,11 +26,11 @@ class BiRefNetMassive(BiRefNetGeneral):
             "https://github.com/danielgatis/rembg/releases/download/v0.0.0/BiRefNet-massive-TR_DIS5K_TR_TEs-epoch_420.onnx",
             None if cls.checksum_disabled(*args, **kwargs) else "md5:33e726a2136a3d59eb0fdf613e31e3e9",
             fname=fname,
-            path=cls.u2net_home(*args, **kwargs),
+            path=cls.ckpt_dir(*args, **kwargs),
             progressbar=True,
         )
 
-        return os.path.join(cls.u2net_home(*args, **kwargs), fname)
+        return os.path.join(cls.ckpt_dir(*args, **kwargs), fname)
 
     @classmethod
     def name(cls, *args, **kwargs):

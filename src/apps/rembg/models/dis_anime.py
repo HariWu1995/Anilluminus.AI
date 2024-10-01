@@ -63,11 +63,11 @@ class Dis(BaseModel):
             "https://github.com/danielgatis/rembg/releases/download/v0.0.0/isnet-anime.onnx",
             None if cls.checksum_disabled(*args, **kwargs) else "md5:6f184e756bb3bd901c8849220a83e38e",
             fname=fname,
-            path=cls.u2net_home(*args, **kwargs),
+            path=cls.ckpt_dir(*args, **kwargs),
             progressbar=True,
         )
 
-        return os.path.join(cls.u2net_home(*args, **kwargs), fname)
+        return os.path.join(cls.ckpt_dir(*args, **kwargs), fname)
 
     @classmethod
     def name(cls, *args, **kwargs):

@@ -258,7 +258,7 @@ class Sam(BaseModel):
             f"https://github.com/danielgatis/rembg/releases/download/v0.0.0/{fname_encoder}",
             None,
             fname=fname_encoder,
-            path=cls.u2net_home(*args, **kwargs),
+            path=cls.ckpt_dir(*args, **kwargs),
             progressbar=True,
         )
 
@@ -266,14 +266,12 @@ class Sam(BaseModel):
             f"https://github.com/danielgatis/rembg/releases/download/v0.0.0/{fname_decoder}",
             None,
             fname=fname_decoder,
-            path=cls.u2net_home(*args, **kwargs),
+            path=cls.ckpt_dir(*args, **kwargs),
             progressbar=True,
         )
 
         if fname_encoder == "sam_vit_h_4b8939.encoder.onnx" and not os.path.exists(
-            os.path.join(
-                cls.u2net_home(*args, **kwargs), "sam_vit_h_4b8939.encoder_data.bin"
-            )
+            os.path.join(cls.ckpt_dir(*args, **kwargs), "sam_vit_h_4b8939.encoder_data.bin")
         ):
             content = bytearray()
 
@@ -282,29 +280,23 @@ class Sam(BaseModel):
                     f"https://github.com/danielgatis/rembg/releases/download/v0.0.0/sam_vit_h_4b8939.encoder_data.{i}.bin",
                     None,
                     fname=f"sam_vit_h_4b8939.encoder_data.{i}.bin",
-                    path=cls.u2net_home(*args, **kwargs),
+                    path=cls.ckpt_dir(*args, **kwargs),
                     progressbar=True,
                 )
 
-                fbin = os.path.join(
-                    cls.u2net_home(*args, **kwargs),
-                    f"sam_vit_h_4b8939.encoder_data.{i}.bin",
-                )
+                fbin = os.path.join(cls.ckpt_dir(*args, **kwargs), f"sam_vit_h_4b8939.encoder_data.{i}.bin")
                 content.extend(open(fbin, "rb").read())
                 os.remove(fbin)
 
             with open(
-                os.path.join(
-                    cls.u2net_home(*args, **kwargs),
-                    "sam_vit_h_4b8939.encoder_data.bin",
-                ),
+                os.path.join(cls.ckpt_dir(*args, **kwargs), "sam_vit_h_4b8939.encoder_data.bin"),
                 "wb",
             ) as fp:
                 fp.write(content)
 
         return (
-            os.path.join(cls.u2net_home(*args, **kwargs), fname_encoder),
-            os.path.join(cls.u2net_home(*args, **kwargs), fname_decoder),
+            os.path.join(cls.ckpt_dir(*args, **kwargs), fname_encoder),
+            os.path.join(cls.ckpt_dir(*args, **kwargs), fname_decoder),
         )
 
     @classmethod

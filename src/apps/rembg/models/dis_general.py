@@ -63,11 +63,11 @@ class Dis(BaseModel):
             "https://github.com/danielgatis/rembg/releases/download/v0.0.0/isnet-general-use.onnx",
             None if cls.checksum_disabled(*args, **kwargs) else "md5:fc16ebd8b0c10d971d3513d564d01e29",
             fname=fname,
-            path=cls.u2net_home(*args, **kwargs),
+            path=cls.ckpt_dir(*args, **kwargs),
             progressbar=True,
         )
 
-        return os.path.join(cls.u2net_home(*args, **kwargs), fname)
+        return os.path.join(cls.ckpt_dir(*args, **kwargs), fname)
 
     @classmethod
     def name(cls, *args, **kwargs):
@@ -83,4 +83,4 @@ class Dis(BaseModel):
         Returns:
             str: The name of the model.
         """
-        return "isnet-general-use"
+        return "isnet-general"

@@ -27,11 +27,11 @@ class BiRefNetPortrait(BiRefNetGeneral):
             "https://github.com/danielgatis/rembg/releases/download/v0.0.0/BiRefNet-portrait-epoch_150.onnx",
             None if cls.checksum_disabled(*args, **kwargs) else "md5:c3a64a6abf20250d090cd055f12a3b67",
             fname=fname,
-            path=cls.u2net_home(*args, **kwargs),
+            path=cls.ckpt_dir(*args, **kwargs),
             progressbar=True,
         )
 
-        return os.path.join(cls.u2net_home(*args, **kwargs), fname)
+        return os.path.join(cls.ckpt_dir(*args, **kwargs), fname)
 
     @classmethod
     def name(cls, *args, **kwargs):

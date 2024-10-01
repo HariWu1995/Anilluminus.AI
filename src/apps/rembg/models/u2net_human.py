@@ -63,11 +63,11 @@ class U2netHuman(BaseModel):
             "https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2net_human_seg.onnx",
             None if cls.checksum_disabled(*args, **kwargs) else "md5:c09ddc2e0104f800e3e1bb4652583d1f",
             fname=fname,
-            path=cls.u2net_home(*args, **kwargs),
+            path=cls.ckpt_dir(*args, **kwargs),
             progressbar=True,
         )
 
-        return os.path.join(cls.u2net_home(*args, **kwargs), fname)
+        return os.path.join(cls.ckpt_dir(*args, **kwargs), fname)
 
     @classmethod
     def name(cls, *args, **kwargs):

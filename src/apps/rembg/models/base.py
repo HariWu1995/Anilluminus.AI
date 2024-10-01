@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from typing import Dict, List, Tuple
 
 from PIL import Image
@@ -74,10 +75,14 @@ class BaseModel:
         return os.getenv("MODEL_CHECKSUM_DISABLED", None) is not None
 
     @classmethod
-    def u2net_home(cls, *args, **kwargs):
-        return os.path.expanduser(
-            os.getenv("U2NET_HOME", os.path.join(os.getenv("XDG_DATA_HOME", "~"), ".u2net"))
-        )
+    def ckpt_dir(cls, *args, **kwargs):
+        ckpt_diroot = str(Path(__file__).parents[4] / 'checkpoints/others/rembg')
+        if not os.path.isdir(ckpt_diroot):
+            os.makedirs(ckpt_diroot)
+        return ckpt_diroot
+        # return os.path.expanduser(
+        #     os.getenv("U2NET_HOME", os.path.join(os.getenv("XDG_DATA_HOME", "~"), ".u2net"))
+        # )
 
     @classmethod
     def download_models(cls, *args, **kwargs):
