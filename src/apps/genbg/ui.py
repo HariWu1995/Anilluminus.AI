@@ -248,7 +248,8 @@ def create_ui(
             iexamples = gr.Examples(
                             example_labels=nameples,
                             examples=examples,
-                            inputs=[modelname, modelclss, modelchnl, strength, guidance, num_steps])
+                            inputs=[img_style, adascale, 
+                                    modelname, modelclss, modelchnl, strength, guidance, num_steps])
 
         ## Functionality
         shared_inputs = [modelname, modelclss, modelchnl,

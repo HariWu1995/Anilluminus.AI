@@ -37,8 +37,10 @@ TEXT_EXAMPLES = [
 
 IMAGE_EXAMPLES = [
     [
-        'Test', 
-        'dreamshaper_inpainting_v8', 'SD-15', 9, 0.9, 33.3, 76
+        'Car / Skycraper', 
+        "./tests/vfst/styles/fe974b3e-goku7090-edit_3-min-1024x683.png", 0.55,
+        'dreamshaper_inpainting_v8', 'SD-15', 9, 
+        0.9, 33.3, 66
     ],
 ]
 
