@@ -5,3 +5,11 @@ sd_ckpt_dirs = [
     'D:/stable-diffusion/sd-15/checkpoints',
 ]
 
+adapter_dirs = [
+    './checkpoints/adapters'
+]
+
+iencoder_dirs = [
+    './checkpoints/image_encoders'
+]
+

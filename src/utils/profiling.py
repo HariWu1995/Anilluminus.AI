@@ -40,13 +40,13 @@ def get_all_gpus_profile():
 def validate_gpu_memory(sd_version: str):
 
     gpu_profile = profile_single_gpu(device_id=0)
-    gpu_free_memory = gpu_profile[-1]
+    gpu_free_memory = round(gpu_profile[-1] / GigaValue, 2)
 
     if sd_version == 'SD-XL':
-        return True if gpu_free_memory > 16.9 else False
+        return True if gpu_free_memory > 16.6 else False
     
     elif sd_version == 'SD-15':
-        return True if gpu_free_memory > 6.66 else False
+        return True if gpu_free_memory > 4.99 else False
 
     else:
         raise ValueError(f'{sd_version} is not supported!')

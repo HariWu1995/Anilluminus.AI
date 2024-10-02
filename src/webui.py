@@ -5,7 +5,7 @@ import gradio as gr
 
 
 ## Global Variables
-from .config import sd_ckpt_dirs
+from .config import sd_ckpt_dirs, adapter_dirs
 from .layout import css, title, description, min_width, main_theme
 from  .usage import tips
 from src.utils import scan_checkpoint_dir, prettify_dict
@@ -15,7 +15,13 @@ for ckpt_dir in sd_ckpt_dirs:
     ckpt_dict = scan_checkpoint_dir(ckpt_dir)
     ckpt_lookup.update(ckpt_dict)
 
+adapter_lookup = dict()
+for adapter_dir in adapter_dirs:
+    adapter_dict = scan_checkpoint_dir(adapter_dir)
+    adapter_lookup.update(adapter_dict)
+
 # prettify_dict(ckpt_lookup)
+prettify_dict(adapter_lookup)
 
 
 ## Layout
@@ -35,8 +41,8 @@ def load_mini_apps():
     with gr.Blocks(css=None, analytics_enabled=False) as gui_background:
 
         gui_rembg, img_rembg = create_ui_rembg()
-        gui_genbg, img_genbg = create_ui_genbg(*img_rembg[:2], models_path=ckpt_lookup)
-
+        gui_genbg, img_genbg = create_ui_genbg(*img_rembg[:2], models_path=ckpt_lookup, 
+                                                             adapters_path=adapter_lookup)
     return  (gui_background, ), \
             (img_genbg[-1], )
 

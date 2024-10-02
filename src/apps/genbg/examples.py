@@ -37,7 +37,8 @@ TEXT_EXAMPLES = [
 
 IMAGE_EXAMPLES = [
     [
-
+        'Test', 
+        'dreamshaper_inpainting_v8', 'SD-15', 9, 0.9, 33.3, 76
     ],
 ]
 
