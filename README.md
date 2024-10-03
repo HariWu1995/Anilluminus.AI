@@ -6,14 +6,15 @@
 
 - [x] GUI (inherited from [A1111](https://github.com/AUTOMATIC1111/stable-diffusion-webui))
 - [x] **Background** Removal
-- [ ] **Background** Stylization (with **Lighting** Control)
-- [ ] **Animation** (AnimateDiff v2, with **Camera** Control)
+- [x] **Background** Stylization
+- [x] **Animation**
+- [ ] **Lighting** and **Camera** Control
 - [ ] **Voiceover** / **Music**
 
 --------------------------
 ## Future Improvements
 
-- [ ] **Sparse-Control** Animation (AnimateDiff v3)
+- [ ] **Animate-Anything** [[notebook](https://www.kaggle.com/code/mrriandmstique/animate-anything-demo/notebook)] [[project](https://github.com/alibaba/animate-anything)]
 - [ ] Video Filters & Effects
 
 --------------------------
@@ -25,7 +26,7 @@
 --------------------------
 ## References
 - `AnimateDiff` [[code](https://github.com/guoyww/AnimateDiff)]
-- `SparseCtrl` [[prject](https://guoyww.github.io/projects/SparseCtrl)]
+- `SparseCtrl` [[project](https://guoyww.github.io/projects/SparseCtrl)]
 - `Background Removal` [[code](https://github.com/danielgatis/rembg)]
 - `Segment-Anything-Model` [[code](https://github.com/continue-revolution/sd-webui-segment-anything)]
 - `Instant Style-Transfer` [[code](https://github.com/instantX-research/InstantStyle)]

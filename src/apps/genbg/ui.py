@@ -10,15 +10,17 @@ import numpy as np
 from PIL import Image, ImageOps
 from PIL.Image import Image as PILImage
 
-from src.utils import scan_checkpoint_dir, find_divisible, \
-                        POSITIVE_PROMPT, NEGATIVE_PROMPT
-from .styles import STYLES, STYLES_PROMPT
+from src.utils import scan_checkpoint_dir, preprocess_image
+from src.utils import POSITIVE_PROMPT, NEGATIVE_PROMPT
 from .examples import TEXT_EXAMPLES, IMAGE_EXAMPLES
+from .styles import STYLES, STYLES_PROMPT
 
 
 ## Variables
 
 SD_VERSION = ['SD-15','SD-XL','BrushNet','BrushNet-XL']
+default_sd = 'SD-15'
+
 
 ckpt_dirs = ['./checkpoints/models']
 ckpt_lookup = dict()
@@ -32,7 +34,7 @@ default_model = 'dreamshaper_inpainting_v8'
 adapter_dirs = ['./checkpoints/adapters']
 adapter_lookup = dict()
 for adapter_dir in adapter_dirs:
-    adapter_dict = scan_checkpoint_dir(adapter_dir)
+    adapter_dict = scan_checkpoint_dir(adapter_dir, sub_model=True)
     adapter_lookup.update(adapter_dict)
 
 default_adapter = 'ip-adapter_sd15'
@@ -40,46 +42,6 @@ default_adapter = 'ip-adapter_sd15'
 
 iencoder_lookup = {'ip_adapter_sd15': './checkpoints/image_encoders/ip_adapter_sd15'}
 default_iencoder = 'ip_adapter_sd15'
-
-
-## Auxiliary Functions
-
-def preprocess_image(image, mask=None, max_area: int = 500_000):
-
-    def find_divisible_by_8(*X, return_mode: str = 'nearest'):
-        return [find_divisible(x, frac=8, return_mode=return_mode) for x in X]
-
-    if isinstance(image, np.ndarray):
-        image = Image.fromarray(image)
-
-    elif not isinstance(image, PILImage):
-        raise TypeError(f"{image.__class__} is not supported!")
-
-    image = image.convert('RGB')
-    W, H = image.size
-
-    ## Auto-Scale
-    W_new, H_new = find_divisible_by_8(W, H, return_mode='nearest')
-    while (H_new * W_new) > max_area:
-        W_new = int(W_new * 0.69)
-        H_new = int(H_new * 0.69)
-        W_new, H_new = find_divisible_by_8(W_new, H_new, return_mode='lower')
-
-    image = image.resize((W_new, H_new))
-
-    if mask is None:
-        return image, (W, H)
-
-    mask = deepcopy(mask)
-
-    if isinstance(mask, np.ndarray):
-        mask = Image.fromarray(mask)
-
-    elif not isinstance(mask, PILImage):
-        raise TypeError(f"{mask.__class__} is not supported!")
-
-    mask = mask.convert('L').resize((W_new, H_new))
-    return (image, mask), (W, H)
 
 
 ## Pipeline
@@ -159,7 +121,7 @@ def generate_by_image(
     return outputs
 
 
-# Define UI settings & layout 
+## Define UI settings & layout 
 
 def create_ui(
     object_image=None, mask_image=None,
@@ -168,8 +130,6 @@ def create_ui(
     min_width: int = 25
 ):
     
-    column_kwargs = dict(variant='panel', min_width=min_width)
-
     global ckpt_lookup, adapter_lookup, iencoder_lookup
 
     if models_path is not None:
@@ -183,6 +143,8 @@ def create_ui(
     MODELS = list(ckpt_lookup.keys())
     ADAPTERS = list(adapter_lookup.keys())
     iENCODERS = list(iencoder_lookup.keys())
+
+    column_kwargs = dict(variant='panel', min_width=min_width)
 
     with gr.Blocks(css=None, analytics_enabled=False) as gui:
 
@@ -213,7 +175,7 @@ def create_ui(
                
                 with gr.Row():
                     modelname = gr.Dropdown(label='Checkpoint', choices=MODELS, multiselect=False, value=default_model)
-                    modelclss = gr.Dropdown(label='Version', choices=SD_VERSION, multiselect=False, value='SD-15')
+                    modelclss = gr.Dropdown(label='Version', choices=SD_VERSION, multiselect=False, value=default_sd)
                     modelchnl = gr.Dropdown(label='In Channels', choices=[4, 9], multiselect=False, value=9)
                 
                 strength = gr.Slider(minimum=.1, maximum=.99, step=.01, value=0.9, label='Strength')

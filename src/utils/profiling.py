@@ -47,6 +47,9 @@ def validate_gpu_memory(sd_version: str):
     
     elif sd_version == 'SD-15':
         return True if gpu_free_memory > 4.99 else False
+    
+    elif sd_version == 'SD-15-AnimateDiff':
+        return True if gpu_free_memory > 5.99 else False
 
     else:
         raise ValueError(f'{sd_version} is not supported!')

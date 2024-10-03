@@ -9,7 +9,8 @@ from pathlib import Path
 MODEL_EXTENSIONS = ['.safetensors','.ckpt','.pt','.pth']
 
 
-def scan_checkpoint_dir(ckpt_dir: Union[str, Path], ckpt_exts: list = MODEL_EXTENSIONS):
+def scan_checkpoint_dir(ckpt_dir: Union[str, Path], 
+                        ckpt_exts: list = MODEL_EXTENSIONS, sub_model: bool = False):
 
     if not  isinstance(ckpt_dir, str):
         ckpt_dir = str(ckpt_dir)
@@ -20,7 +21,15 @@ def scan_checkpoint_dir(ckpt_dir: Union[str, Path], ckpt_exts: list = MODEL_EXTE
 
     # Entire-folder
     for ckpt_name in os.listdir(ckpt_dir):
-        if not os.path.isdir(os.path.join(ckpt_dir, ckpt_name, 'unet')):
+        if not sub_model:
+            if not os.path.isdir(os.path.join(ckpt_dir, ckpt_name, 'unet')):
+                continue
+        elif (
+            not any([
+                    os.path.isfile(os.path.join(ckpt_dir, ckpt_name, ckpt)) 
+                for ckpt in ['config.json','diffusion_pytorch_model.safetensors']
+            ])
+        ):
             continue
         ckpt_dict[ckpt_name] = os.path.join(ckpt_dir, ckpt_name)
 

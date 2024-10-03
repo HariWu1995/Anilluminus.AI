@@ -76,7 +76,7 @@ class BaseModel:
 
     @classmethod
     def ckpt_dir(cls, *args, **kwargs):
-        ckpt_diroot = str(Path(__file__).parents[4] / 'checkpoints/others/rembg')
+        ckpt_diroot = str(Path(__file__).parents[4] / 'checkpoints/rembg')
         if not os.path.isdir(ckpt_diroot):
             os.makedirs(ckpt_diroot)
         return ckpt_diroot

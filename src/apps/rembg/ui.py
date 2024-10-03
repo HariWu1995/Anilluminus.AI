@@ -42,6 +42,18 @@ def run_rembg(img, alpha, alpha_fg_threshold, alpha_bg_threshold, alpha_erosion_
     return img, mask
 
 
+def save_all(image, mask):
+
+    if isinstance(image, np.ndarray):
+        image = Image.fromarray(image)
+
+    if isinstance(mask, np.ndarray):
+        mask = Image.fromarray(mask)
+
+    image.save('./logs/image.png')
+    mask.save('./logs/mask.png')
+
+
 def invert_mask(mask):
     if isinstance(mask, np.ndarray):
         mask = Image.fromarray(mask)
@@ -87,11 +99,14 @@ def create_ui(min_width: int = 25):
         with gr.Row():
 
             with gr.Column(scale=2, **column_kwargs):
-                run_button = gr.Button(value="Decompose", variant='primary')
-                inv_button = gr.Button(value="Invert Mask", variant='secondary')
+                with gr.Row():
+                    run_button = gr.Button(value="Decompose", variant='primary')
+                    inv_button = gr.Button(value="Invert Mask", variant='secondary')
+                with gr.Row():
+                    exp_button = gr.Button(value="Expand", variant='secondary')
+                    save_button = gr.Button(value="Save", variant='secondary')
                 # app_button = gr.Button(value="Apply Mask", variant='secondary')
                 # send_button = gr.Button(value="Send ⇩", variant='secondary')
-                exp_button = gr.Button(value="Expand", variant='secondary')
 
             with gr.Column(scale=4, **column_kwargs):
 
@@ -125,6 +140,7 @@ def create_ui(min_width: int = 25):
 
         inv_button.click(fn=invert_mask, inputs=[img_mask], outputs=[img_mask])
         run_button.click(fn=run_rembg, inputs=rembg_inputs, outputs=[img_out, img_mask])
+        save_button.click(fn=save_all, inputs=[img_out, img_mask], outputs=None)
 
     return gui, [img_out, img_mask]
 
