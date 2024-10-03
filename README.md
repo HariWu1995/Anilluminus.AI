@@ -52,23 +52,53 @@ python -m src.webui
 
 #### Background Decomposition and Expansion
 - User can put image with background and use this module to decompose into object and mask
-
-<img class="center" alt="teaser" src="assets/rembg_example.png" width="50%" class="center"/>
-
+- <img class="center" alt="teaser" src="assets/rembg_example.png" width="75%" class="center"/>
 - Else, just insert object and background images to feed into next module
-
+- User can expand the image to have larger canvas to fill in next module
+- <img class="center" alt="teaser" src="assets/rembg_expansion.png" width="75%" class="center"/>
 
 #### Background Stylization
+<img class="center" alt="teaser" src="assets/genbg.png" width="80%" class="center"/>
 
+- Tick into the Checkbox **Image Style Transfer** to switch between 2 modes below
+- For each mode, there are **examples** at the bottom of the panel for user to quick test
+
+<details>
+  <summary><b>Text-Guided Generation</b></summary>
+
+- Test case: **Car / Luxury**
+<img class="center" alt="teaser" src="assets/genbg_text_car_1.png" width="80%" class="center"/>
+
+- Test case: **Car / Futuristic**
+<img class="center" alt="teaser" src="assets/genbg_text_car_2.png" width="80%" class="center"/>
+
+- Test case: **Jewelry / Glamorous**
+<img class="center" alt="teaser" src="assets/genbg_text_jewelry_1.png" width="80%" class="center"/>
+
+- Test case: **Milk / Eco-Friendly**
+<img class="center" alt="teaser" src="assets/genbg_text_milk_1.png" width="80%" class="center"/>
+
+- Test case: **Jar / Eco-Friendly**
+<img class="center" alt="teaser" src="assets/genbg_text_jar_1.png" width="80%" class="center"/>
+
+
+</details>
+
+<details>
+  <summary><b>Image-Guided Style-Transfer</b></summary>
+
+- Test case: **Car / Luxury**
+<img class="center" alt="teaser" src="assets/genbg_image_car_1.png" width="80%" class="center"/>
+
+- The **IP-Adapter InstantStyle** for **SD-1.5** is not good - it is said by its author. Should be changed to **SD-XL** version, which requires more GPU again!
+</details>
 
 #### Animation 
-- ⚠️ Not tested completely due to limitation of GPU
-- Quick comparison on Kaggle notebook: 
+⚠️ Not tested completely due to limitation of GPU
+- Quick comparison on **Kaggle** notebooks: 
     - [AnimateDiff](https://www.kaggle.com/code/mrriandmstique/ani-mate-diff-demo): this model doesn't follow the initial image, even in examples of its owner
     - [AnimateAnything](https://www.kaggle.com/code/mrriandmstique/animate-anything-demo): this model works much better than ~~AnimateDiff~~
-
---------------------------
-## Self-Criticism
+- Overwrite class `AnimateDiffSparseControlNetPipeline` in `diffusers` in file `./src/apps/anime/pipelines/animatediff_sparsectrl.py` to feed sub-modules (**UNet**, **Text Encoder**, **ControlNet**) to GPU only when in need. However, it runs out of my time to test.
 
 --------------------------
 ## References
