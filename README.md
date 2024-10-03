@@ -21,7 +21,54 @@
 ## Dataset
 
 --------------------------
+## Getting started
+
+This code was tested with:
+
+* Windows 11
+* NVIDIA GeForce RTX 3060 - 6144 MiB
+* Python 3.10.6
+* CUDA 12.1
+
+Setup environment (⚠️ `requirements.txt` is shared among my SD projects using **A1111** and **ComfyUI**, hence, it is not cleaned):
+
+```shell
+pip install -q -r requirements.txt
+```
+
+#### Download **Checkpoints**
+- [DreamShaper v8 Inpainting](https://civitai.com/models/4384) to local folder `./checkpoints/models/dreamshaper_inpainting_v8.safetensors`
+
+#### Add other **Checkpoints** directories
+- open file `src/config.py` and add any directories into variable `sd_ckpt_dirs`
+
+--------------------------
 ## User Guide
+
+#### Run **Gradio UI**
+```shell
+python -m src.webui
+```
+
+#### Background Decomposition and Expansion
+- User can put image with background and use this module to decompose into object and mask
+
+<img class="center" alt="teaser" src="assets/rembg_example.png" width="50%" class="center"/>
+
+- Else, just insert object and background images to feed into next module
+
+
+#### Background Stylization
+
+
+#### Animation 
+- ⚠️ Not tested completely due to limitation of GPU
+- Quick comparison on Kaggle notebook: 
+    - [AnimateDiff](https://www.kaggle.com/code/mrriandmstique/ani-mate-diff-demo): this model doesn't follow the initial image, even in examples of its owner
+    - [AnimateAnything](https://www.kaggle.com/code/mrriandmstique/animate-anything-demo): this model works much better than ~~AnimateDiff~~
+
+--------------------------
+## Self-Criticism
 
 --------------------------
 ## References
