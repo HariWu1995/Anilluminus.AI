@@ -99,9 +99,7 @@ python -m src.webui
     - [AnimateDiff](https://www.kaggle.com/code/mrriandmstique/ani-mate-diff-demo): this model doesn't follow the initial image, even in examples of its owner
     ![AnimateDiff](assets/animatediff_result.gif)
     - [AnimateAnything](https://www.kaggle.com/code/mrriandmstique/animate-anything-demo): this model works much better than ~~AnimateDiff~~
-    <video width="320" height="240" controls>
-      <source src="assets/animateanything_result.mp4" type="video/mp4">
-    </video>
+    ![AnimateAnything](assets/animateanything_result.gif)
 
 - Overwrite class `AnimateDiffSparseControlNetPipeline` in `diffusers` in file `./src/apps/anime/pipelines/animatediff_sparsectrl.py` to feed sub-modules (**UNet**, **Text Encoder**, **ControlNet**) to GPU only when in need. However, it runs out of my time to test.
 
