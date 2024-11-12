@@ -23,8 +23,8 @@ import gradio as gr
 ## Global Variables
 from .config import sd_ckpt_dirs, adapter_dirs
 from .layout import css, title, description, min_width, main_theme
-from  .usage import tips
-from src.utils import scan_checkpoint_dir, prettify_dict
+from .usage import tips
+from .utils import scan_checkpoint_dir, prettify_dict
 
 ckpt_lookup = dict()
 for ckpt_dir in sd_ckpt_dirs:

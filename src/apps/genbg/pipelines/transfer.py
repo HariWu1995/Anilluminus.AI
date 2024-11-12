@@ -1,3 +1,5 @@
+import os
+
 from typing import List, Union
 from tqdm import tqdm
 
@@ -107,9 +109,10 @@ def run_pipeline(
     neg_content_scale = 0.8
 
     if neg_content is not None:
-        from transformers import CLIPTextModelWithProjection as CLIPTextModel, CLIPTokenizer
 
-        pretrained_clip_model = "laion/CLIP-ViT-H-14-laion2B-s32B-b79K"
+        from transformers import CLIPTextModelWithProjection as CLIPTextModel, CLIPTokenizer
+        from src.config import clip_text_encoder as pretrained_clip_model
+
         textcoder = CLIPTextModel.from_pretrained(pretrained_clip_model).to(pipe.device, dtype=pipe.dtype)
         tokenizer = CLIPTokenizer.from_pretrained(pretrained_clip_model)
 

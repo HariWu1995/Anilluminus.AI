@@ -9,7 +9,6 @@ adapter_dirs = [
     './checkpoints/adapters'
 ]
 
-iencoder_dirs = [
-    './checkpoints/image_encoders'
-]
+clip_text_encoder = "E:/LLM/clip-vit-h14-laion2B-s32B-b79K"
+# clip_text_encoder = "laion/CLIP-ViT-H-14-laion2B-s32B-b79K"
 
