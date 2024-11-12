@@ -4,7 +4,7 @@
 --------------------------
 ## To-Do List
 
-- [x] GUI (inherited from [A1111](https://github.com/AUTOMATIC1111/stable-diffusion-webui))
+- [x] GUI
 - [x] **Background** Removal
 - [x] **Background** Stylization
 - [ ] **Animation**
