@@ -76,13 +76,16 @@ class BaseModel:
 
     @classmethod
     def ckpt_dir(cls, *args, **kwargs):
-        ckpt_diroot = str(Path(__file__).parents[4] / 'checkpoints/rembg')
+        try:
+            from src.config.paths import rembg_dir as ckpt_diroot
+        except:
+            ckpt_diroot = str(Path(__file__).parents[4] / 'checkpoints/rembg')
+            # ckpt_diroot = os.path.expanduser(
+            #     os.getenv("U2NET_HOME", os.path.join(os.getenv("XDG_DATA_HOME", "~"), ".u2net"))
+            # )
         if not os.path.isdir(ckpt_diroot):
             os.makedirs(ckpt_diroot)
         return ckpt_diroot
-        # return os.path.expanduser(
-        #     os.getenv("U2NET_HOME", os.path.join(os.getenv("XDG_DATA_HOME", "~"), ".u2net"))
-        # )
 
     @classmethod
     def download_models(cls, *args, **kwargs):

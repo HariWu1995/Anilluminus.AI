@@ -21,23 +21,20 @@ import gradio as gr
 
 
 ## Global Variables
-from .config import sd_ckpt_dirs, adapter_dirs
-from .layout import css, title, description, min_width, main_theme
-from .usage import tips
-from .utils import scan_checkpoint_dir, prettify_dict
+
+from .utils import scan_checkpoint_dir, prettify_dict, validate_gpu_memory
+from .config import css, min_width, main_theme, \
+                    title, description, tips, \
+                    sd15_ckpt_dirs, sdxl_ckpt_dirs
+
+sd_ckpt_dirs = sd15_ckpt_dirs + (sdxl_ckpt_dirs if validate_gpu_memory('SD-XL') else [])
 
 ckpt_lookup = dict()
 for ckpt_dir in sd_ckpt_dirs:
     ckpt_dict = scan_checkpoint_dir(ckpt_dir)
     ckpt_lookup.update(ckpt_dict)
 
-adapter_lookup = dict()
-for adapter_dir in adapter_dirs:
-    adapter_dict = scan_checkpoint_dir(adapter_dir, sub_model=True)
-    adapter_lookup.update(adapter_dict)
-
 # prettify_dict(ckpt_lookup)
-# prettify_dict(adapter_lookup)
 
 
 ## Layout
@@ -51,6 +48,7 @@ def load_mini_apps():
 
     global ckpt_lookup
 
+    from collections import OrderedDict
     from src.apps.rembg.ui import create_ui as create_ui_rembg
     from src.apps.genbg.ui import create_ui as create_ui_genbg
     from src.apps.anime.ui import create_ui as create_ui_anime
@@ -58,19 +56,18 @@ def load_mini_apps():
     with gr.Blocks(css=None, analytics_enabled=False) as gui_background:
 
         gui_rembg, img_rembg = create_ui_rembg()
-        gui_genbg, img_genbg = create_ui_genbg(*img_rembg[:2], models_path=ckpt_lookup, 
-                                                             adapters_path=adapter_lookup)
+        gui_genbg, img_genbg = create_ui_genbg(*img_rembg[:2], models_path=ckpt_lookup)
 
-    gui_anime = create_ui_anime(models_path=ckpt_lookup, adapters_path=adapter_lookup)
+    gui_anime = create_ui_anime(models_path=ckpt_lookup)
 
-    return (gui_background, gui_anime), (img_genbg[-1], )
+    return (gui_background, gui_anime), \
+            ("Background", "Animation"), \
+            (img_genbg[-1], )
 
 
 def run_demo(server: str = 'localhost', port: int = 7861, share: bool = False):
 
-    tabs, *_ = load_mini_apps()
-
-    names = ["Background", "Animation"]
+    tabs, names, *_ = load_mini_apps()
 
     with gr.Blocks(css=css, theme=main_theme, analytics_enabled=False) as demo:
         
@@ -79,7 +76,6 @@ def run_demo(server: str = 'localhost', port: int = 7861, share: bool = False):
         gr.Markdown(description)
 
         # Body
-
         gr.TabbedInterface(interface_list=tabs, tab_names=names)
 
         # Footer

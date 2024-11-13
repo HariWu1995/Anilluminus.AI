@@ -16,15 +16,16 @@ from diffusers.image_processor import IPAdapterMaskProcessor
 from diffusers.utils.import_utils import is_xformers_available
 
 from src.utils import MODEL_EXTENSIONS
-from src.utils.profiling import profile_single_gpu, validate_gpu_memory
+from src.utils import profile_single_gpu, validate_gpu_memory
 
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 DTYPE = torch.float16 if str(DEVICE).__contains__("cuda") else torch.float32
 
 
-def load_pipeline(model_path: str, adapter_path: str, iencoder_path: str,
-                  sd_version: str, num_in_channels: int = 9):
+def load_pipeline(model_path: str, adapter_path: List[str], iencoder_path: str,
+                  sd_version: str, adapter_mode: str = 'style only', 
+             num_in_channels: int = 9):
         
     torch.cuda.empty_cache()
 
@@ -38,17 +39,28 @@ def load_pipeline(model_path: str, adapter_path: str, iencoder_path: str,
         device = torch.device('cpu')
         dtype = torch.float32
 
-    # print(is_enough_memory, device, dtype)
-
     if sd_version == 'SD-15':
+
         from diffusers import StableDiffusionInpaintPipeline as SdInpaintPipeline
-        from src.ip_adapter import IPAdapter
+        from ip_adapter import IPAdapter
+
         target_blocks = ["block"]
 
     elif sd_version == 'SD-XL':
+
         from diffusers import StableDiffusionXLInpaintPipeline as SdInpaintPipeline
-        from src.ip_adapter import IPAdapterXL as IPAdapter
-        target_blocks = ["up_blocks.0.attentions.1"]
+        from ip_adapter import IPAdapterXL as IPAdapter
+    
+        if adapter_mode == 'style only':
+            target_blocks = ["up_blocks.0.attentions.1"]
+
+        elif adapter_mode == 'style + layout':
+            target_blocks = ["up_blocks.0.attentions.1", "down_blocks.2.attentions.1"]
+
+        else:
+            target_blocks = ["blocks"]
+
+        ## TODO: load CS-Composer
 
     config = dict(torch_dtype=dtype, num_in_channels=num_in_channels, local_files_only=True)
 
@@ -67,15 +79,16 @@ def load_pipeline(model_path: str, adapter_path: str, iencoder_path: str,
         pipe.enable_xformers_memory_efficient_attention()
 
     # Load Ip-Adapter
-    ip_model = IPAdapter(pipe, iencoder_path, adapter_path, device, target_blocks=target_blocks)
-
+    ip_path = os.path.join(*adapter_path)
+    ip_model = IPAdapter(pipe, iencoder_path, ip_path, device, target_blocks=target_blocks)
     return ip_model
 
 
 def run_pipeline(
     model_path: str, 
-    adapter_path: str, 
+    adapter_path: List[str], 
     iencoder_path: str, 
+    adapter_mode: str, 
     sd_version: str, 
     n_channels: int,
     image: ImageClass, 
@@ -86,7 +99,8 @@ def run_pipeline(
     **kwargs
 ):
 
-    pipe = load_pipeline(model_path, adapter_path, iencoder_path, sd_version, n_channels)
+    pipe = load_pipeline(model_path, adapter_path, iencoder_path, 
+                         sd_version, adapter_mode, n_channels)
     
     if isinstance(image, np.ndarray):
         image = Image.fromarray(image)
@@ -111,10 +125,12 @@ def run_pipeline(
     if neg_content is not None:
 
         from transformers import CLIPTextModelWithProjection as CLIPTextModel, CLIPTokenizer
-        from src.config import clip_text_encoder as pretrained_clip_model
+        from src.config import text_encodirs
 
-        textcoder = CLIPTextModel.from_pretrained(pretrained_clip_model).to(pipe.device, dtype=pipe.dtype)
-        tokenizer = CLIPTokenizer.from_pretrained(pretrained_clip_model)
+        pretrained_model = text_encodirs['ip_adapter']
+
+        textcoder = CLIPTextModel.from_pretrained(pretrained_model).to(pipe.device, dtype=pipe.dtype)
+        tokenizer = CLIPTokenizer.from_pretrained(pretrained_model)
 
         tokens = tokenizer([neg_content], return_tensors='pt').to(pipe.device)
         neg_content_emb = textcoder(**tokens).text_embeds

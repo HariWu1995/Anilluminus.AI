@@ -34,9 +34,9 @@ default_vae = 'stabilityai-sd-vae-ft-mse'
 
 adapter_dirs = ['./checkpoints/adapters']
 adapter_lookup = dict()
-for adapter_dir in adapter_dirs:
-    adapter_dict = scan_checkpoint_dir(adapter_dir, sub_model=True)
-    adapter_lookup.update(adapter_dict)
+# for adapter_dir in adapter_dirs:
+#     adapter_dict = scan_checkpoint_dir(adapter_dir, sub_model=True)
+#     adapter_lookup.update(adapter_dict)
 
 default_adapter = 'animatediff-motion-adapter-sd15-v3'
 

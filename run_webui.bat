@@ -9,7 +9,7 @@ set PYTHON="C:\Program Files\Python310\python.exe"
 
 :activate_venv
 echo %VENV_DIR%\Scripts\activate
-:call %PYTHON% -m pip install numpy==1.23.5
+call %PYTHON% -m pip install numpy==1.23.5
 
 :launch
 CD /D %WORK_DIR%

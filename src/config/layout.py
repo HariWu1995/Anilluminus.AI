@@ -18,3 +18,9 @@ title = r"""
 description = r"""
 <b>Gradio demo</b> for <a href='https://github.com/HariWu1995/Anilluminus.AI' target='_blank'><b> Anilluminus.AI </b></a>.<br>
 """
+
+tips = r"""
+### Usage tips
+1. If you're not satisfied, ..."
+2. If you feel that ...
+"""

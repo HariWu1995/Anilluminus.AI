@@ -10,7 +10,8 @@ import numpy as np
 from PIL import Image, ImageOps
 from PIL.Image import Image as PILImage
 
-from src.utils import scan_checkpoint_dir, preprocess_image
+from src.config import sd15_ckpt_dirs, sdxl_ckpt_dirs, image_encodirs, ip_adapters
+from src.utils import scan_checkpoint_dir, preprocess_image, validate_gpu_memory
 from src.utils import POSITIVE_PROMPT, NEGATIVE_PROMPT
 from .examples import TEXT_EXAMPLES, IMAGE_EXAMPLES
 from .styles import STYLES, STYLES_PROMPT
@@ -22,26 +23,19 @@ SD_VERSION = ['SD-15','SD-XL','BrushNet','BrushNet-XL']
 default_sd = 'SD-15'
 
 
-ckpt_dirs = ['./checkpoints/models']
+sd_ckpt_dirs = sd15_ckpt_dirs + (sdxl_ckpt_dirs if validate_gpu_memory('SD-XL') else [])
+
 ckpt_lookup = dict()
-for ckpt_dir in ckpt_dirs:
+for ckpt_dir in sd_ckpt_dirs:
     ckpt_dict = scan_checkpoint_dir(ckpt_dir)
     ckpt_lookup.update(ckpt_dict)
 
-default_model = 'dreamshaper_inpainting_v8'
+default_model = 'dreamshaper_8_inpainting'
 
 
-adapter_dirs = ['./checkpoints/adapters']
-adapter_lookup = dict()
-for adapter_dir in adapter_dirs:
-    adapter_dict = scan_checkpoint_dir(adapter_dir, sub_model=True)
-    adapter_lookup.update(adapter_dict)
-
-default_adapter = 'ip-adapter_sd15'
-
-
-iencoder_lookup = {'ip_adapter_sd15': './checkpoints/image_encoders/ip_adapter_sd15'}
-default_iencoder = 'ip_adapter_sd15'
+adapter_modes = ['original','style only','style + layout']
+adapter_lookup = ip_adapters
+default_adapter = 'ip_adapter_15'
 
 
 ## Pipeline
@@ -89,16 +83,16 @@ def generate_by_text(
 
 
 def generate_by_image(
-        styled_image, iencoder,
-        adapter, adapter_strength,
+        styled_image,
+        adapter, adapter_strength, adapter_mode,
         ckpt, sd_version, model_channel,
         image, mask, 
         strength, guidance, num_steps, batch_size,
     ):
-
+    
     ckpt_path = ckpt_lookup[ckpt]
     adapter_path = adapter_lookup[adapter]
-    iencoder_path = iencoder_lookup[iencoder]
+    iencoder_path = image_encodirs[adapter]
 
     ## Preprocessing
     (image, mask), (W, H) = preprocess_image(image, mask, max_area=250_000)
@@ -112,7 +106,8 @@ def generate_by_image(
                          guidance_scale = guidance, 
                     num_inference_steps = num_steps, )
 
-    generated = run_pipeline(ckpt_path, adapter_path, iencoder_path, sd_version, model_channel,
+    generated = run_pipeline(ckpt_path, adapter_path, iencoder_path, 
+                            adapter_mode, sd_version, model_channel,
                              image, mask, styled_image, **diffusion_kwargs)
 
     ## Output Formatting --> Gallery
@@ -127,10 +122,11 @@ def create_ui(
     object_image=None, mask_image=None,
     models_path=None, model_default=None,
     adapters_path=None, adapter_default=None,
-    min_width: int = 25
+    min_width: int = 25, 
+    **kwargs
 ):
     
-    global ckpt_lookup, adapter_lookup, iencoder_lookup
+    global ckpt_lookup, adapter_lookup
 
     if models_path is not None:
         print('Overwrite SD checkpoints lookup-table ...')
@@ -142,7 +138,6 @@ def create_ui(
 
     MODELS = list(ckpt_lookup.keys())
     ADAPTERS = list(adapter_lookup.keys())
-    iENCODERS = list(iencoder_lookup.keys())
 
     column_kwargs = dict(variant='panel', min_width=min_width)
 
@@ -166,8 +161,8 @@ def create_ui(
 
             with gr.Column(scale=3, visible=False, **column_kwargs) as prompt_image:
                 img_style = gr.Image(label='Style Image')
-                iencoder = gr.Dropdown(label='Im-Encoder', choices=iENCODERS, multiselect=False, value=default_iencoder)
-                adapter = gr.Dropdown(label='Ip-Adapter', choices=ADAPTERS, multiselect=False, value=default_adapter)
+                adapter = gr.Dropdown(label='Ip-Adapter', choices=ADAPTERS, value=default_adapter, multiselect=False)
+                adamode = gr.Dropdown(label='Ip-Mode', choices=adapter_modes, value='style only', multiselect=False)
                 adascale = gr.Slider(label='Ip-Strength', minimum=.1, maximum=1.99, step=.01, value=0.55)
                 img_gen = gr.Button(value="Generate", variant='primary')
 
@@ -183,13 +178,12 @@ def create_ui(
 
             with gr.Column(scale=3, **column_kwargs) as output_panel:
                 
-                with gr.Row():
-                    batch_size = gr.Slider(minimum=1, maximum=100, step=1, value=1, label='Batch Size')
-                    num_steps = gr.Slider(minimum=25, maximum=100, step=1, value=50, label='Inference Steps')
-                
                 # genlery = gr.Image(label="Generated images")
                 genlery = gr.Gallery(label="Generated images", show_label=True, elem_id="gallery", 
                                     columns=[4], rows=[1], object_fit="contain", height="auto")
+                with gr.Row():
+                    batch_size = gr.Slider(minimum=1, maximum=100, step=1, value=1, label='Batch Size')
+                    num_steps = gr.Slider(minimum=25, maximum=100, step=1, value=50, label='Inference Steps')
             
         with gr.Row(visible=True) as text_recmmd:
             examples, nameples = [], []
@@ -219,8 +213,8 @@ def create_ui(
                          strength, guidance, num_steps, batch_size]
 
         txt_gen.click(fn=generate_by_text, inputs=[prompt, styles]+shared_inputs, outputs=[genlery])
-        img_gen.click(fn=generate_by_image, inputs=[img_style, iencoder,
-                                                    adapter, adascale]+shared_inputs, outputs=[genlery])
+        img_gen.click(fn=generate_by_image, inputs=[img_style, 
+                                        adapter, adascale, adamode]+shared_inputs, outputs=[genlery])
 
         switch_modality = lambda x: [gr.update(visible = x), gr.update(visible = not x), 
                                      gr.update(visible = x), gr.update(visible = not x)]
@@ -231,6 +225,8 @@ def create_ui(
     return gui, [genlery]
 
 
+if __name__ == "__main__":
 
-
+    gui, *_ = create_ui()
+    gui.launch(server_name='localhost', server_port=7861, share=False)
 

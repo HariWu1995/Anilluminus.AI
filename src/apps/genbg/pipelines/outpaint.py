@@ -13,7 +13,7 @@ from diffusers.pipelines.controlnet.multicontrolnet import MultiControlNetModel
 from diffusers.utils.import_utils import is_xformers_available
 
 from src.utils import MODEL_EXTENSIONS
-from src.utils.profiling import profile_single_gpu, validate_gpu_memory
+from src.utils import profile_single_gpu, validate_gpu_memory
 
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")

@@ -15,8 +15,8 @@ import random as rd
 import numpy as np
 import torch
 
-from src.utils import MODEL_EXTENSIONS
-from src.utils.profiling import profile_single_gpu, validate_gpu_memory
+from src.utils import MODEL_EXTENSIONS, GigaValue
+from src.utils import profile_single_gpu, validate_gpu_memory
 
 gpu_profile = profile_single_gpu(device_id=0)
 gpu_free_memory = round(gpu_profile[-1] / GigaValue, 2)

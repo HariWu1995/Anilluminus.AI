@@ -32,6 +32,7 @@ def reshape_tensor(x, heads):
 
 
 class PerceiverAttention(nn.Module):
+
     def __init__(self, *, dim, dim_head=64, heads=8):
         super().__init__()
         self.scale = dim_head**-0.5
@@ -79,6 +80,7 @@ class PerceiverAttention(nn.Module):
 
 
 class Resampler(nn.Module):
+
     def __init__(
         self,
         dim=1024,
@@ -99,8 +101,8 @@ class Resampler(nn.Module):
         self.latents = nn.Parameter(torch.randn(1, num_queries, dim) / dim**0.5)
 
         self.proj_in = nn.Linear(embedding_dim, dim)
-
         self.proj_out = nn.Linear(dim, output_dim)
+
         self.norm_out = nn.LayerNorm(output_dim)
 
         self.to_latents_from_mean_pooled_seq = (
@@ -116,12 +118,10 @@ class Resampler(nn.Module):
         self.layers = nn.ModuleList([])
         for _ in range(depth):
             self.layers.append(
-                nn.ModuleList(
-                    [
-                        PerceiverAttention(dim=dim, dim_head=dim_head, heads=heads),
-                        FeedForward(dim=dim, mult=ff_mult),
-                    ]
-                )
+                nn.ModuleList([
+                    PerceiverAttention(dim=dim, dim_head=dim_head, heads=heads),
+                    FeedForward(dim=dim, mult=ff_mult),
+                ])
             )
 
     def forward(self, x):
@@ -156,3 +156,4 @@ def masked_mean(t, *, dim, mask=None):
     masked_t = t.masked_fill(~mask, 0.0)
 
     return masked_t.sum(dim=dim) / denom.clamp(min=1e-5)
+
