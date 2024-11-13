@@ -488,24 +488,6 @@ class AnimateDiffSparseControlNetPipeline(
 
         return ip_adapter_image_embeds
 
-    # Copied from diffusers.pipelines.text_to_video_synthesis/pipeline_text_to_video_synth.TextToVideoSDPipeline.decode_latents
-    def decode_latents(self, latents):
-
-        self.vae = self.vae.to(self.device_temp)
-        latents = latents.to(self.device_temp)
-
-        latents = 1 / self.vae.config.scaling_factor * latents
-
-        batch_size, channels, num_frames, height, width = latents.shape
-        latents = latents.permute(0, 2, 1, 3, 4).reshape(batch_size * num_frames, channels, height, width)
-
-        image = self.vae.decode(latents).sample
-
-        video = image[None, :].reshape((batch_size, num_frames, -1) + image.shape[2:]).permute(0, 2, 1, 3, 4)
-        # we always cast to float32 as this does not cause significant overhead and is compatible with bfloat16
-        video = video.float()
-        return video
-
     # Copied from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion.StableDiffusionPipeline.prepare_extra_step_kwargs
     def prepare_extra_step_kwargs(self, generator, eta):
         # prepare extra kwargs for the scheduler step, since not all schedulers have the same signature
@@ -736,6 +718,24 @@ class AnimateDiffSparseControlNetPipeline(
 
         return controlnet_cond, controlnet_cond_mask
 
+    # Copied from diffusers.pipelines.text_to_video_synthesis/pipeline_text_to_video_synth.TextToVideoSDPipeline.decode_latents
+    def decode_latents(self, latents):
+
+        self.vae = self.vae.to(self.device_main)
+        latents = latents.to(self.device_main)
+
+        latents = 1 / self.vae.config.scaling_factor * latents
+
+        batch_size, channels, num_frames, height, width = latents.shape
+        latents = latents.permute(0, 2, 1, 3, 4).reshape(batch_size * num_frames, channels, height, width)
+
+        image = self.vae.decode(latents).sample
+
+        video = image[None, :].reshape((batch_size, num_frames, -1) + image.shape[2:]).permute(0, 2, 1, 3, 4)
+        # we always cast to float32 as this does not cause significant overhead and is compatible with bfloat16
+        video = video.float()
+        return video
+
     @property
     def guidance_scale(self):
         return self._guidance_scale
@@ -744,9 +744,9 @@ class AnimateDiffSparseControlNetPipeline(
     def clip_skip(self):
         return self._clip_skip
 
-    # here `guidance_scale` is defined analog to the guidance weight `w` of equation (2)
-    # of the Imagen paper: https://arxiv.org/pdf/2205.11487.pdf . `guidance_scale = 1`
-    # corresponds to doing no classifier free guidance.
+    # `guidance_scale` is defined similarly as the guidance weight `w`
+    # of equation (2) of the Imagen paper: https://arxiv.org/pdf/2205.11487.pdf . 
+    # `guidance_scale = 1` means to doing no classifier free guidance.
     @property
     def do_classifier_free_guidance(self):
         return self._guidance_scale > 1
@@ -1095,7 +1095,20 @@ class AnimateDiffSparseControlNetPipeline(
         if output_type == "latent":
             video = latents
         else:
+            print('\t Removing components ...')
+            del self.unet
+            del self.controlnet
+            del self.text_encoder
+            del self.motion_adapter
+            torch.cuda.empty_cache()
+
+            import gc
+            _ = gc.collect()
+
+            print('\t Decoding latents ...')
             video_tensor = self.decode_latents(latents)
+    
+            print('\t Postprocessing video ...')
             video = self.video_processor.postprocess_video(video = video_tensor, 
                                                      output_type = output_type)
 

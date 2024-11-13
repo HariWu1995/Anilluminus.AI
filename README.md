@@ -94,14 +94,13 @@ python -m src.webui
 </details>
 
 #### Animation 
-⚠️ Not tested completely due to limitation of GPU
+- ⚠️ Overwrite class `AnimateDiffSparseControlNetPipeline` in `diffusers` in file `./src/apps/anime/pipelines/animatediff_sparsectrl.py` to feed sub-modules (**UNet**, **Text Encoder**, **ControlNet**, **VAE**) to GPU only when in need. With this effort, AnimateDiff (SD-15) can run on 6Gb GPU.
+
 - Quick comparison on **Kaggle** notebooks: 
     - [AnimateDiff](https://www.kaggle.com/code/mrriandmstique/ani-mate-diff-demo): this model doesn't follow the initial image, even in examples of its owner
     ![AnimateDiff](assets/animatediff_result.gif)
     - [AnimateAnything](https://www.kaggle.com/code/mrriandmstique/animate-anything-demo): this model works much better than ~~AnimateDiff~~
     ![AnimateAnything](assets/animateanything_result.gif)
-
-- Overwrite class `AnimateDiffSparseControlNetPipeline` in `diffusers` in file `./src/apps/anime/pipelines/animatediff_sparsectrl.py` to feed sub-modules (**UNet**, **Text Encoder**, **ControlNet**) to GPU only when in need. However, it runs out of my time to test.
 
 --------------------------
 ## References

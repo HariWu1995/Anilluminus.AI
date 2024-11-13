@@ -3,7 +3,7 @@ Reference:
     https://huggingface.co/docs/diffusers/en/api/pipelines/animatediff
     https://github.com/huggingface/diffusers/blob/main/docs/source/en/api/pipelines/animatediff.md
 """
-import os
+import os, gc
 
 from typing import List, Union
 from tqdm import tqdm
@@ -31,6 +31,7 @@ from diffusers.models import AutoencoderKL, MotionAdapter, SparseControlNetModel
 from diffusers.schedulers import DPMSolverMultistepScheduler as Scheduler
 from diffusers.loaders import FromSingleFileMixin
 from diffusers.utils import export_to_video, load_video
+from diffusers.utils.import_utils import is_xformers_available
 
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -44,7 +45,7 @@ class AnimationPipeline(AnimateDiffSparseControlNetPipeline, FromSingleFileMixin
 def load_pipeline(
         sd_version: str,
         model_path: str,
-        vae_path: str,
+          vae_path: str,
         motion_adapter_path: str,
         lora_adapter_path: str,
         controlnet_path: str,
@@ -104,7 +105,11 @@ def load_pipeline(
 
     # enable memory savings
     pipe.enable_vae_slicing()
+    pipe.enable_vae_tiling()
     # pipe.enable_model_cpu_offload()
+
+    if is_xformers_available():
+        pipe.enable_xformers_memory_efficient_attention()
 
     return pipe
 
@@ -120,25 +125,30 @@ def run_pipeline(
     ):
 
     kwargs.update(dict(generator = torch.Generator().manual_seed(rd.randint(1, 768))))
-
     pipe = load_pipeline(sd_version, model_path, vae_path, adapter_path, lora_path, ctrlnet_path)
+    
     video = pipe(**kwargs).frames[0]
-
     return video
 
 
 if __name__ == "__main__":
 
-    model_path          = "D:/stable-diffusion/sd-15/checkpoints/absolutereality_v16.safetensors"
-    # model_path          = './checkpoints/models/Realistic_Vision_V5.1_noVAE'
-    vae_path            = './checkpoints/vae/stabilityai-sd-vae-ft-mse'
-    controlnet_path     = './checkpoints/controlnets/animatediff-sparsectrl-rgb'
-    motion_adapter_path = './checkpoints/adapters/animatediff-motion-adapter-sd15-v3'
-    lora_adapter_path   = './checkpoints/loras/animatediff-motion-lora-sd15-v3'
+    import os
+    os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+    os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:25"
+    os.environ["PYTORCH_NO_CUDA_MEMORY_CACHING"] = "1"
 
-    image_path = './tests/vfst/styles/Screenshot 2024-10-01 114551.png'
+    vae_path = "D:/stable-diffusion/sd-15/VAE/stabilityai-sd-vae-ft-mse"
+    model_path = "D:/stable-diffusion/sd-15/checkpoints/absolutereality_v16.safetensors"
+    # model_path = "D:/stable-diffusion/sd-15/checkpoints/realisticVisionV51_v20_woVAE.safetensors"
 
-    image = Image.open(image_path).convert('RGB')
+    animatediff_dir = "E:/stable-diffusion/AnimateDiff"
+    controlnet_path = f"{animatediff_dir}/controlnet/animatediff-sparsectrl-rgb"
+    lora_adapter_path = f"{animatediff_dir}/lora/animatediff-motion-sd15-v3"
+    motion_adapter_path = f"{animatediff_dir}/adapter/animatediff-motion-sd15-v3"
+
+    image_path = './tests/vfst/styles/Screenshot 2024-10-01 114518.png'
+    image = Image.open(image_path).convert('RGB').resize((620, 350))
 
     video = run_pipeline(
 
