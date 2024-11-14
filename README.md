@@ -1,5 +1,5 @@
 # Anilluminus.AI
-[Illuminus.ai] **Multi-Modal Content Creation** for Product Marketing.
+**Multi-Modal Content Creation** for Product Marketing.
 
 --------------------------
 ## To-Do List

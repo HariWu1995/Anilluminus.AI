@@ -183,7 +183,7 @@ def create_ui(
                                     columns=[4], rows=[1], object_fit="contain", height="auto")
                 with gr.Row():
                     batch_size = gr.Slider(minimum=1, maximum=100, step=1, value=1, label='Batch Size')
-                    num_steps = gr.Slider(minimum=25, maximum=100, step=1, value=50, label='Inference Steps')
+                    num_steps = gr.Slider(minimum=25, maximum=100, step=1, value=50, label='Diffusion Steps')
             
         with gr.Row(visible=True) as text_recmmd:
             examples, nameples = [], []

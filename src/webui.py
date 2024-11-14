@@ -15,7 +15,7 @@ os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:25"
 os.environ["PYTORCH_NO_CUDA_MEMORY_CACHING"] = "1"
 
 import sys
-sys.path.append('../')
+sys.path.append('./')
 
 import gradio as gr
 
@@ -48,26 +48,36 @@ def load_mini_apps():
 
     global ckpt_lookup
 
-    from collections import OrderedDict
-    from src.apps.rembg.ui import create_ui as create_ui_rembg
-    from src.apps.genbg.ui import create_ui as create_ui_genbg
-    from src.apps.anime.ui import create_ui as create_ui_anime
+    gui_config = dict(css=None, analytics_enabled=False)
 
-    with gr.Blocks(css=None, analytics_enabled=False) as gui_background:
+    with gr.Blocks(**gui_config) as gui_background:
+
+        from src.apps.rembg.ui import create_ui as create_ui_rembg
+        from src.apps.genbg.ui import create_ui as create_ui_genbg
 
         gui_rembg, img_rembg = create_ui_rembg()
         gui_genbg, img_genbg = create_ui_genbg(*img_rembg[:2], models_path=ckpt_lookup)
 
-    gui_anime = create_ui_anime(models_path=ckpt_lookup)
+    with gr.Blocks(**gui_config) as gui_animation:
 
-    return (gui_background, gui_anime), \
-            ("Background", "Animation"), \
-            (img_genbg[-1], )
+        from src.apps.animate.ui import create_ui as create_ui_animate
+        from src.apps.anymate.ui import create_ui as create_ui_anymate
+
+        gr.Markdown("## ୧⍤⃝ Animation")
+
+        with gr.Tab(label='AnimateDiff') as gui_animate:
+            create_ui_animate(models_path=ckpt_lookup)
+    
+        with gr.Tab(label='AnimateAnything') as gui_anymate:
+            create_ui_anymate(models_path=ckpt_lookup)
+
+    return  (gui_background, gui_animation, ), \
+            (   "Background",   "Animation", )
 
 
 def run_demo(server: str = 'localhost', port: int = 7861, share: bool = False):
 
-    tabs, names, *_ = load_mini_apps()
+    tabs, names = load_mini_apps()
 
     with gr.Blocks(css=css, theme=main_theme, analytics_enabled=False) as demo:
         

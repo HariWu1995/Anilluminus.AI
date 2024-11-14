@@ -64,9 +64,12 @@ ip_adapters = dict(
 ## @ https://huggingface.co/guoyww/animatediff
 
 animatediroot = "E:/stable-diffusion/AnimateDiff"
-animatediff = dict(
-    ctrlnet = f"{animatediroot}/controlnet",
-       lora = f"{animatediroot}/lora",
+animatediff = dict()
+
+animatediff['rgb'] = dict(
+    ctrlnet = f"{animatediroot}/controlnet/animatediff-sparsectrl-rgb",
+    adapter = f"{animatediroot}/adapter/animatediff-motion-sd15-v3",
+       lora = f"{animatediroot}/lora/animatediff-motion-sd15-v3",
 )
 
 
