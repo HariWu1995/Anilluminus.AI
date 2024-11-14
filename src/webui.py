@@ -68,8 +68,9 @@ def load_mini_apps():
         with gr.Tab(label='AnimateDiff') as gui_animate:
             create_ui_animate(models_path=ckpt_lookup)
     
-        # with gr.Tab(label='AnimateAnything') as gui_anymate:
-        #     create_ui_anymate(models_path=ckpt_lookup)
+        with gr.Tab(label='AnimateAnything') as gui_anymate:
+            gr.Markdown("Coming soon ...")
+            # create_ui_anymate(models_path=ckpt_lookup)
 
     return  (gui_background, gui_animation, ), \
             (   "Background",   "Animation", )
