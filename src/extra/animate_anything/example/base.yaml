@@ -2,13 +2,14 @@
 # pretrained_model_path: "output/latent/train_mask_motion" #https://huggingface.co/damo-vilab/text-to-video-ms-1.7b/tree/main
 # pretrained_model_path: "output/latent/train_4fps"
 # pretrained_model_path: "/data/llm/zeroscope_v2_576w"
-pretrained_model_path: "checkpoints"
+# pretrained_model_path: "checkpoints"
+pretrained_model_path: "E:/stable-diffusion/AnimateAnything"
 
 motion_mask: True
 motion_strength: True
 
 # The folder where your training outputs will be placed.
-output_dir: "./output"
+output_dir: "./outputs"
 
 # You can train multiple datasets at once. They will be joined together for training.
 # Simply remove the line you don't need, or keep them all for mixed training.

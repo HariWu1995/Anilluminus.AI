@@ -1,21 +1,29 @@
-import json
 import os
 import os.path as osp
-import random
-from argparse import ArgumentParser
-from datetime import datetime
-import math
 
-import gradio as gr
-import numpy as np
-import torch
-from diffusers import DDIMScheduler, EulerDiscreteScheduler, PNDMScheduler
-from diffusers.image_processor import VaeImageProcessor
+import json
+import random
+
+from datetime import datetime
+from argparse import ArgumentParser
 from omegaconf import OmegaConf
+
+import math
+import numpy as np
+import gradio as gr
+
+import imageio
 from PIL import Image
+
+import torch
 import torchvision.transforms as T
 from einops import rearrange, repeat
-import imageio
+
+from diffusers import DDIMScheduler, EulerDiscreteScheduler, PNDMScheduler
+from diffusers.image_processor import VaeImageProcessor
+
+import sys
+sys.path.append('./')
 
 from models.pipeline import LatentToVideoPipeline as Pipeline
 from utils.common import tensor_to_vae_latent, DDPM_forward
@@ -30,8 +38,8 @@ css = """
 }
 """
 
-# DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-DEVICE = 'cpu'
+DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+# DEVICE = 'cpu'
 
 
 class AnimateController:
@@ -45,8 +53,8 @@ class AnimateController:
         device = torch.device(DEVICE)
         kwargs = dict()
         if DEVICE.startswith('cuda'):
-            kwargs.update(dict(torch_dtype=torch.float16, 
-                                   variant="fp16"))
+            kwargs.update(dict(torch_dtype=torch.float16, variant="fp16"))
+
         self.pipeline = Pipeline.from_pretrained(
                                       pretrained_model_path, **kwargs).to(device)
 
@@ -83,12 +91,15 @@ class AnimateController:
 
         pimg = init_img["background"]
         # pimg = init_img["image"]
+
         pimg = Image.fromarray(pimg).convert('RGB')
         width, height = pimg.size
-        scale = math.sqrt(width*height / (validation_data.height*validation_data.width))
-        block_size=8
+        scale = math.sqrt(width * height / (validation_data.height * validation_data.width))
+        
+        block_size = 8
         height = round(height/scale/block_size) * block_size
         width = round(width/scale/block_size) * block_size
+        
         input_image = vae_processor.preprocess(pimg, height, width)
         input_image = input_image.unsqueeze(0).to(dtype).to(device)
         input_image_latents = tensor_to_vae_latent(input_image, vae)
@@ -96,9 +107,10 @@ class AnimateController:
         np_mask = init_img["layers"][0][:,:,3]
         # np_mask = init_img["mask"]
         # print(np_mask.shape)
-        np_mask[np_mask!=0] = 255
+        np_mask[np_mask != 0] = 255
         if np_mask.sum() == 0:
             np_mask[:] = 255
+
         save_sample_path = os.path.join(
             self.output_dir, f"{self.sample_idx}.mp4")
         out_mask_path = os.path.splitext(save_sample_path)[0] + "_mask.jpg"
@@ -106,9 +118,12 @@ class AnimateController:
  
         b, c, _, h, w = input_image_latents.shape
         initial_latents, timesteps = DDPM_forward(input_image_latents, 
-            sample_step_slider, validation_data.num_frames, diffusion_scheduler) 
-        mask = T.ToTensor()(np_mask).to(dtype).to(device)
+                                                    sample_step_slider, 
+                                            validation_data.num_frames, 
+                                                    diffusion_scheduler) 
+        
         b, c, f, h, w = initial_latents.shape
+        mask = T.ToTensor()(np_mask).to(dtype).to(device)
         mask = T.Resize([h, w], antialias=False)(mask)
         mask = rearrange(mask, 'b h w -> b 1 1 h w')
         motion_strength = motion_scale * mask.mean().item()
@@ -126,8 +141,8 @@ class AnimateController:
                 condition_latent=input_image_latents,
                 mask=mask,
                 motion=[motion_strength],
-                return_dict=False,
                 timesteps=timesteps,
+                return_dict=False,
             )
 
         imageio.mimwrite(save_sample_path, video_frames, fps=8)
@@ -174,8 +189,8 @@ def ui(controller):
 
                     with gr.Row():
                         seed_textbox = gr.Textbox(label="Seed", value=-1)
-                        seed_button = gr.Button(
-                            value="\U0001F3B2", elem_classes="toolbutton")
+                        seed_button = gr.Button(value="\U0001F3B2", elem_classes="toolbutton")
+
                     seed_button.click(
                         fn=lambda x: random.randint(1, 1e8),
                         outputs=[seed_textbox],
@@ -227,7 +242,7 @@ def ui(controller):
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument('--config', type=str, default='example/base.yaml')
-    parser.add_argument('--server', type=str, default='0.0.0.0')
+    parser.add_argument('--server', type=str, default='localhost')
     parser.add_argument('--port', type=int, default=7860)
     parser.add_argument('--share', action='store_true')
     parser.add_argument('--local-debug', action='store_true')

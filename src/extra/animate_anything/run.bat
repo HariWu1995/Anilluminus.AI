@@ -2,15 +2,18 @@
 
 set GIT=
 set VENV_DIR=C:\Users\Mr. RIAH\Documents\GenAI\sd_env
-set PYTHON="%VENV_DIR%\Scripts\Python.exe"
-::set PYTHON="C:\Program Files\Python310\python.exe"
+
+set PYTHON="C:\Program Files\Python310\python.exe"
+:set PYTHON="%VENV_DIR%\Scripts\Python.exe"
 
 ::TIMEOUT /T 1
 
-::call "C:\Users\Mr. RIAH\Documents\sd_env\Scripts\activate.bat"
+echo %VENV_DIR%\Scripts\activate
 
 ::call %PYTHON% -m pip install -r requirements.txt
 call %PYTHON% -m pip install gradio==4.25.0
+call %PYTHON% -m pip install diffusers==0.24.0
+
 call %PYTHON% app.py
 
 echo.

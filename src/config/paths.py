@@ -60,7 +60,7 @@ ip_adapters = dict(
 )
 
 
-## AnimateDiff for animation
+## Animation
 ## @ https://huggingface.co/guoyww/animatediff
 
 animatediroot = "E:/stable-diffusion/AnimateDiff"
@@ -71,6 +71,8 @@ animatediff['rgb'] = dict(
     adapter = f"{animatediroot}/adapter/animatediff-motion-sd15-v3",
        lora = f"{animatediroot}/lora/animatediff-motion-sd15-v3",
 )
+
+anymation_dir = "E:/stable-diffusion/AnimateAnything"
 
 
 ## Others

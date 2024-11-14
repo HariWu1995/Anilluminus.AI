@@ -1,13 +1,14 @@
+import PIL
 from typing import Callable, Dict, List, Optional, Union
+
 import torch
 from einops import rearrange, repeat
-import PIL
 
 from diffusers import TextToVideoSDPipeline, StableVideoDiffusionPipeline
-from diffusers.pipelines.text_to_video_synthesis.pipeline_text_to_video_synth import tensor2vid, TextToVideoSDPipelineOutput
-from diffusers.pipelines.stable_video_diffusion.pipeline_stable_video_diffusion import tensor2vid as svd_tensor2vid, StableVideoDiffusionPipelineOutput
 from diffusers.loaders import LoraLoaderMixin, TextualInversionLoaderMixin
 from diffusers.utils.torch_utils import randn_tensor
+from diffusers.pipelines.text_to_video_synthesis.pipeline_text_to_video_synth import tensor2vid, TextToVideoSDPipelineOutput
+from diffusers.pipelines.stable_video_diffusion.pipeline_stable_video_diffusion import tensor2vid as svd_tensor2vid, StableVideoDiffusionPipelineOutput
 
 
 class LatentToVideoPipeline(TextToVideoSDPipeline):
@@ -161,13 +162,17 @@ class LatentToVideoPipeline(TextToVideoSDPipeline):
         num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
         uncondition_latent = condition_latent
         condition_latent = torch.cat([uncondition_latent, condition_latent]) if do_classifier_free_guidance else condition_latent 
+        
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):
+
                 # expand the latents if we are doing classifier free guidance
                 latent_model_input = torch.cat([latents] * 2) if do_classifier_free_guidance else latents
                 latent_model_input = self.scheduler.scale_model_input(latent_model_input, t)
+                
                 if motion is not None:
                     motion = torch.tensor(motion, device=device)
+                
                 noise_pred = self.unet(
                     latent_model_input,
                     t,
@@ -177,6 +182,7 @@ class LatentToVideoPipeline(TextToVideoSDPipeline):
                     mask=mask,
                     motion=motion
                 ).sample
+
                 # perform guidance
                 if do_classifier_free_guidance:
                     noise_pred_uncond, noise_pred_text = noise_pred.chunk(2)
@@ -184,7 +190,7 @@ class LatentToVideoPipeline(TextToVideoSDPipeline):
 
                 # reshape latents
                 bsz, channel, frames, width, height = latents.shape
-                latents = latents.permute(0, 2, 1, 3, 4).reshape(bsz * frames, channel, width, height)
+                latents    =    latents.permute(0, 2, 1, 3, 4).reshape(bsz * frames, channel, width, height)
                 noise_pred = noise_pred.permute(0, 2, 1, 3, 4).reshape(bsz * frames, channel, width, height)
 
                 # compute the previous noisy sample x_t -> x_t-1
