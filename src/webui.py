@@ -69,11 +69,19 @@ def load_mini_apps():
             create_ui_animate(models_path=ckpt_lookup)
     
         with gr.Tab(label='AnimateAnything') as gui_anymate:
-            gr.Markdown("Coming soon ...")
+            gr.Button(value="Coming soon ...", variant='primary')
             # create_ui_anymate(models_path=ckpt_lookup)
 
-    return  (gui_background, gui_animation, ), \
-            (   "Background",   "Animation", )
+    ## Prettification
+    from collections import OrderedDict
+
+    gui_dict = OrderedDict([
+        ("Background", gui_background),
+        ("Animation", gui_animation),
+    ])
+
+    return  tuple(gui_dict.values()), \
+            tuple(gui_dict.keys())
 
 
 def run_demo(server: str = 'localhost', port: int = 7861, share: bool = False):
