@@ -106,6 +106,7 @@ def load_pipeline(
     # enable memory savings
     pipe.enable_vae_slicing()
     pipe.enable_vae_tiling()
+    pipe.enable_attention_slicing()
     # pipe.enable_model_cpu_offload()
 
     if is_xformers_available():

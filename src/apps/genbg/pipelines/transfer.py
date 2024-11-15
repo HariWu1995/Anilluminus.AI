@@ -75,8 +75,12 @@ def load_pipeline(model_path: str, adapter_path: List[str], iencoder_path: str,
     # Re-load scheduler
     pipe.scheduler = Scheduler.from_config(pipe.scheduler.config)
 
+    # enable memory savings
+    pipe.enable_vae_slicing()
     pipe.enable_vae_tiling()
+    pipe.enable_attention_slicing()
     # pipe.enable_model_cpu_offload()
+    
     if is_xformers_available():
         pipe.enable_xformers_memory_efficient_attention()
 

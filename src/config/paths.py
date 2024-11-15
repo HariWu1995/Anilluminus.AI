@@ -77,4 +77,8 @@ anymation_dir = "E:/stable-diffusion/AnimateAnything"
 
 ## Others
 rembg_dir = 'D:/rembg'
+sam_dir = 'E:/SAM'
+lama_dict = dict(
+    lama_big = "E:/stable-diffusion/lama-big",
+)
 

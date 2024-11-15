@@ -53,7 +53,7 @@ def load_pipeline(model_path: str, sd_version: str, num_in_channels: int = 9):
     pipe.enable_vae_tiling()
     pipe.enable_attention_slicing()
     # pipe.enable_model_cpu_offload()
-    
+
     if is_xformers_available():
         pipe.enable_xformers_memory_efficient_attention()
 
